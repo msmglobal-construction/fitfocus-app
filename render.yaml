@@ -1,0 +1,26 @@
+# Render Blueprint for the Fit Focus members app.
+# One web service that builds the client + server and serves both from one origin.
+# Connect this repo in the Render dashboard ("New +" -> "Blueprint") and Render
+# will build and deploy automatically on every push to the default branch.
+services:
+  - type: web
+    name: fitfocus-app
+    runtime: node
+    plan: starter # "starter" (paid) is required for the persistent disk below.
+    region: oregon
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data
+    # Persists the SQLite database and uploaded trainer videos across deploys.
+    # Remove this block to run on the free plan (data resets on each deploy).
+    disk:
+      name: fitfocus-data
+      mountPath: /var/data
+      sizeGB: 1

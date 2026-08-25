@@ -1,15 +1,11 @@
-import { createReadStream, existsSync, mkdirSync, statSync, unlinkSync } from "node:fs";
-import { dirname, extname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { createReadStream, existsSync, statSync, unlinkSync } from "node:fs";
+import { extname, resolve } from "node:path";
 import { Router } from "express";
 import multer from "multer";
 import { hasActiveSubscription } from "../billing.js";
 import { db } from "../db.js";
+import { UPLOAD_DIR } from "../paths.js";
 import type { Video } from "../types.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const UPLOAD_DIR = resolve(__dirname, "../../uploads");
-mkdirSync(UPLOAD_DIR, { recursive: true });
 
 export const videosRouter = Router();
 

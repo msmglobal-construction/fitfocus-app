@@ -1,3 +1,6 @@
+import { existsSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import cors from "cors";
 import express from "express";
 import { seedIfEmpty, seedPlans } from "./db.js";
@@ -72,6 +75,22 @@ app.get("/api/stats", (_req, res) => {
     weeklyVolume: days,
   });
 });
+
+// In production, serve the built React app from the same origin and let the
+// client handle any non-API route (single-page app fallback).
+const here = dirname(fileURLToPath(import.meta.url));
+const clientDist = process.env.CLIENT_DIST
+  ? resolve(process.env.CLIENT_DIST)
+  : resolve(here, "../../client/dist");
+
+if (existsSync(join(clientDist, "index.html"))) {
+  app.use(express.static(clientDist));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) return next();
+    res.sendFile(join(clientDist, "index.html"));
+  });
+  console.log(`Serving client from ${clientDist}`);
+}
 
 // Surface multer/upload errors as JSON instead of HTML stack traces.
 app.use(

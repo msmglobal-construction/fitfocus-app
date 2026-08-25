@@ -1,11 +1,8 @@
 import Database from "better-sqlite3";
-import { mkdirSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
+import { DATA_DIR } from "./paths.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = resolve(__dirname, "../data/fittrack.db");
-mkdirSync(dirname(dbPath), { recursive: true });
+const dbPath = join(DATA_DIR, "fittrack.db");
 
 export const db = new Database(dbPath);
 db.pragma("journal_mode = WAL");
