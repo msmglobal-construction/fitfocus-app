@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api } from "./api";
+import { api, isDemoMode } from "./api";
 import { Dashboard } from "./pages/Dashboard";
 import { PlansPage } from "./pages/PlansPage";
 import { VideosPage } from "./pages/VideosPage";
@@ -21,6 +21,11 @@ export default function App() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [billingVersion, setBillingVersion] = useState(0);
   const [addSignal, setAddSignal] = useState(0);
+  const [demo, setDemo] = useState(false);
+
+  useEffect(() => {
+    void isDemoMode().then(setDemo);
+  }, []);
 
   const refreshBilling = useCallback(async () => {
     const [p, s] = await Promise.all([api.getPlans(), api.getSubscriptions()]);
@@ -47,6 +52,14 @@ export default function App() {
               <span className="hidden text-xs text-slate-400 sm:inline">
                 Laconia, NH · Members app
               </span>
+              {demo && (
+                <span
+                  title="No backend connected — data is sample data and resets on refresh."
+                  className="rounded-full border border-brand-500/40 bg-brand-500/10 px-2.5 py-0.5 text-xs font-semibold text-brand-300"
+                >
+                  Demo
+                </span>
+              )}
             </div>
             <button
               onClick={() => {
