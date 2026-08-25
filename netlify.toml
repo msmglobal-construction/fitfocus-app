@@ -1,0 +1,26 @@
+# Netlify hosts the Fit Focus FRONTEND (the static React build).
+#
+# The backend (Express API + SQLite + trainer-video uploads/streaming) needs an
+# always-on server, which Netlify cannot run: its serverless functions have no
+# persistent disk (workouts, subscriptions, and uploaded videos would not
+# persist) and cannot stream video. So the API runs on a full-stack host and
+# Netlify proxies /api/* to it via the redirect below.
+
+[build]
+  command = "npm install && npm run build --workspace client"
+  publish = "client/dist"
+
+# Send API calls to the deployed backend. Replace BACKEND_HOST with your live
+# backend origin (e.g. fitfocus-app.onrender.com). Tell me the URL and I'll set
+# this and push for you.
+[[redirects]]
+  from = "/api/*"
+  to = "https://BACKEND_HOST/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback so client-side routes resolve to the app shell.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
